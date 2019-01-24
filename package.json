@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@vechain/connex": "1.0.0",
+    "custom-protocol-detection": "1.0.1",
     "nes.css": "1.0.0",
     "vue": "^2.5.21",
     "vue-class-component": "^6.0.0",
