@@ -1,8 +1,12 @@
 <template>
     <header class="page-header">
-        <div>
-            VET: {{vet}}
-            VTHO: {{vtho}}
+        <div class="balance">
+            <span>VET:</span>
+            <span>{{vet}}</span>
+        </div>
+        <div class="balance">
+            <span>VTHO:</span>
+            <span>{{vtho}}</span>
         </div>
     </header>
 </template>
@@ -17,13 +21,13 @@ export default class PageHeader extends Vue {
     get vet() {
         const result = parseInt(this.balance, 16) / 1e18;
 
-        return result.toLocaleString();
+        return Math.round(result).toLocaleString();
     }
 
     get vtho() {
         const result = parseInt(this.energy, 16) / 1e18;
 
-        return result.toLocaleString();
+        return Math.round(result).toLocaleString();
     }
 
     public async created() {
@@ -46,5 +50,17 @@ export default class PageHeader extends Vue {
     width: 100%;
     left: 0;
     padding: 10px 20px;
+}
+.balance {
+    display: flex;
+}
+.balance span:first-of-type {
+    width: 100px;
+    padding-right: 10px;
+    text-align: right;
+}
+.balance span:last-of-type {
+    width: 220px;
+    text-align: right;
 }
 </style>
