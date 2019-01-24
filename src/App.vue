@@ -82,21 +82,21 @@ export default class App extends Vue {
     public step = 0;
     private syncReleaseUrl = `https://github.com/vechain/thor-sync.electron/releases`;
 
-    private hasConnex = window.connex && window.connex.vendor
+    private hasConnex = window.connex && window.connex.vendor;
 
     public openSync() {
-        const customProtocolDetection = require('custom-protocol-detection')
-        const vechainAppUrl = 'vechain-app:///' + encodeURIComponent(window.location.href)
+        const customProtocolDetection = require('custom-protocol-detection');
+        const vechainAppUrl = 'vechain-app:///' + encodeURIComponent(window.location.href);
         const gotoDownload = () => {
-            window.location.href = this.syncReleaseUrl
-        }
+            window.location.href = this.syncReleaseUrl;
+        };
         customProtocolDetection(vechainAppUrl, () => {
-            gotoDownload()
+            gotoDownload();
         }, () => {
             // TODO Open with sync
         }, () => {
-            gotoDownload()
-        })
+            gotoDownload();
+        });
     }
 
     public async postRequest(cert: Connex.Vendor.SigningService.CertResponse) {
