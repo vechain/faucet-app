@@ -58,6 +58,12 @@
                 </div>
             </div>
 
+            <div v-if="step === 4.1">
+                <div class="nes-field">
+                    <p>Greed is good! BUT save some for others! Come back tomorrow.</p>
+                </div>
+            </div>
+
             <div class="step-5" v-if="step === 5">
                 <a @click="reset" href="javascript:;" class="frame-close">
                     <i class="nes-icon close"></i>
@@ -106,6 +112,7 @@ export default class App extends Vue {
     public step = 0;
     private syncReleaseUrl = `https://github.com/vechain/thor-sync.electron/releases`;
     private txid = '';
+    private respError = ''
 
     private hasConnex = window.connex && window.connex.vendor;
     private isTestNet = true;
@@ -155,7 +162,12 @@ export default class App extends Vue {
                 this.step = 5;
             } else {
                 if (resp.status === 403) {
-                    this.step = 4;
+                    const body = await resp.text()
+                    if (body) {
+                        this.step = 4.1
+                    } else {
+                        this.step = 4;
+                    }
                 } else {
                     throw new Error('unknow error');
                 }
