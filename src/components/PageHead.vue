@@ -17,6 +17,7 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class PageHeader extends Vue {
     public balance = '0x0';
     public energy = '0x0';
+    private account = connex.thor.account('0x4f6FC409e152D33843Cf4982d414C1Dd0879277e');
 
     get vet() {
         const result = parseInt(this.balance, 16) / 1e18;
@@ -29,15 +30,17 @@ export default class PageHeader extends Vue {
 
         return Math.round(result).toLocaleString();
     }
-
+    public async setBalance() {
+        const theAccount = await this.account.get();
+        this.balance = theAccount.balance;
+        this.energy = theAccount.energy;
+    }
     public async created() {
         const ticker = connex.thor.ticker();
-        const account = connex.thor.account('0x4f6FC409e152D33843Cf4982d414C1Dd0879277e');
+        // const account = connex.thor.account('0x4f6FC409e152D33843Cf4982d414C1Dd0879277e');
         for (; ;) {
             await ticker.next();
-            const theAccount = await account.get();
-            this.balance = theAccount.balance;
-            this.energy = theAccount.energy;
+            await this.setBalance();
         }
     }
 }
