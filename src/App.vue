@@ -1,7 +1,7 @@
 <template>
     <div id="app">
-        <PageHead v-if="hasConnex"/>
-        <section v-if="!hasConnex" class="form nes-container with-title">
+        <PageHead v-if="hasConnex && isTestNet"/>
+        <section v-if="!hasConnex" class="nes-container with-title">
             <h2 class="title">Connex not detected</h2>
             <p>
                 It's recommended to open in
@@ -11,13 +11,18 @@
             </p>
             <div>
                 <a @click="openSync" href="javascript:;" class="sync-link">Open</a> or
-                <a
-                    :href="syncReleaseUrl"
-                    class="sync-link"
-                >Download</a> VeChain Sync.
+                <a :href="syncReleaseUrl" class="sync-link">Download</a> VeChain Sync.
             </div>
         </section>
-        <section v-if="hasConnex" class="form nes-container" style="text-align: center">
+        <section
+            v-if="!isTestNet"
+            class="nes-container with-title"
+        >Faucet is only available in testnet.</section>
+        <section
+            v-if="hasConnex && isTestNet"
+            class="form nes-container"
+            style="text-align: center"
+        >
             <div v-if="step === 1" class="nes-field">
                 <p>AH!!!</p>
                 <p>It's you!!! Let me see what i can find for you!</p>
@@ -53,6 +58,22 @@
                 </div>
             </div>
 
+            <div class="step-5" v-if="step === 5">
+                <a @click="reset" href="javascript:;" class="frame-close">
+                    <i class="nes-icon close"></i>
+                </a>
+                <div class="nes-field">
+                    <p>
+                        I found this!!! TXID:
+                        <a
+                            :href="`https://insight.vecha.in/#/txs/${txid}`"
+                            target="_blank"
+                        >{{txid}}</a>, good luck on your joruney!!
+                    </p>
+                    <button @click="reset" class="nes-btn">Bye! See you soon!</button>
+                </div>
+            </div>
+
             <form v-if="step === 0" @submit.prevent="signCert">
                 <div class="nes-field">
                     <p>Welcome to the VeChainThor world, i think you need to some magic to explore the world</p>
@@ -62,16 +83,19 @@
                 </div>
             </form>
         </section>
+        <PageFoot/>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import PageHead from './components/PageHead.vue';
+import PageFoot from './components/PageFoot.vue';
 
 @Component({
     components: {
         PageHead,
+        PageFoot,
     },
 })
 export default class App extends Vue {
@@ -81,8 +105,16 @@ export default class App extends Vue {
     public isSuccess = false;
     public step = 0;
     private syncReleaseUrl = `https://github.com/vechain/thor-sync.electron/releases`;
+    private txid = '';
 
     private hasConnex = window.connex && window.connex.vendor;
+    private isTestNet = true;
+
+    public async created() {
+        if (this.hasConnex) {
+            this.isTestNet = await this.checkNet();
+        }
+    }
 
     public openSync() {
         const customProtocolDetection = require('custom-protocol-detection');
@@ -99,9 +131,15 @@ export default class App extends Vue {
         });
     }
 
+    public async checkNet() {
+        const block = connex.thor.block(0);
+        const firstBlock = await block.get();
+        return firstBlock!.id === '0x000000000b2bce3c70bc649a02749e8687721b09ed2e15997f466536b20bb127';
+    }
+
     public async postRequest(cert: Connex.Vendor.SigningService.CertResponse) {
         try {
-            await fetch('https://faucet.outofgas.io/requests', {
+            const resp = await fetch('https://faucet.outofgas.io/requests', {
                 method: 'post',
                 mode: 'cors',
                 cache: 'no-cache',
@@ -111,18 +149,30 @@ export default class App extends Vue {
                 referrer: 'no-referrer',
                 body: JSON.stringify(cert),
             });
+            if (resp.status === 200 && resp.headers.get('content-type')!.includes('application/json')) {
+                const body = await resp.json();
+                this.txid = body.id;
+                this.step = 5;
+            } else {
+                if (resp.status === 403) {
+                    this.step = 4;
+                } else {
+                    throw new Error('unknow error');
+                }
+            }
+
         } catch (error) {
-            return error.name + error.message;
+            this.step = 3;
         }
     }
     public reset() {
         this.step = 0;
     }
     public async signCert() {
-        this.step = 1;
         const signSvc = connex.vendor.sign('cert');
+        let result: any;
         try {
-            const result = await signSvc.request({
+            result = await signSvc.request({
                 purpose: 'identification',
                 payload: {
                     type: 'text',
@@ -132,11 +182,13 @@ export default class App extends Vue {
 Select a wallet  which you would like to receive the tokens`,
                 },
             });
-            this.postRequest(result);
+            this.step = 1;
         } catch (error) {
             this.step = 2;
-            return error.name + error.message;
+            return;
         }
+
+        this.postRequest(result);
     }
 }
 </script>
@@ -169,7 +221,8 @@ body {
     text-align: right;
     margin-top: 20px;
 }
-.step-2 {
+.step-2,
+.step-5 {
     padding-top: 30px;
 }
 .frame-close {
