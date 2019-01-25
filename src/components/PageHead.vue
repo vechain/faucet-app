@@ -37,7 +37,6 @@ export default class PageHeader extends Vue {
     }
     public async created() {
         const ticker = connex.thor.ticker();
-        // const account = connex.thor.account('0x4f6FC409e152D33843Cf4982d414C1Dd0879277e');
         for (; ;) {
             await ticker.next();
             await this.setBalance();
