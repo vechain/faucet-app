@@ -112,7 +112,7 @@ export default class App extends Vue {
     public step = 0;
     private syncReleaseUrl = `https://github.com/vechain/thor-sync.electron/releases`;
     private txid = '';
-    private respError = ''
+    private respError = '';
 
     private hasConnex = window.connex && window.connex.vendor;
     private isTestNet = true;
@@ -162,9 +162,9 @@ export default class App extends Vue {
                 this.step = 5;
             } else {
                 if (resp.status === 403) {
-                    const body = await resp.text()
+                    const body = await resp.text();
                     if (body) {
-                        this.step = 4.1
+                        this.step = 4.1;
                     } else {
                         this.step = 4;
                     }
