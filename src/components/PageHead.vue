@@ -36,6 +36,7 @@ export default class PageHeader extends Vue {
         this.energy = theAccount.energy;
     }
     public async created() {
+        this.setBalance();
         const ticker = connex.thor.ticker();
         for (; ;) {
             await ticker.next();
