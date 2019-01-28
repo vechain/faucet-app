@@ -15,7 +15,7 @@
             </div>
         </section>
         <section
-            v-if="!isTestNet"
+            v-if="hasConnex && !isTestNet"
             class="nes-container with-title"
         >Faucet is only available in testnet.</section>
         <section
@@ -25,7 +25,7 @@
         >
             <div v-if="step === 1" class="nes-field">
                 <p>AH!!!</p>
-                <p>It's you!!! Let me see what i can find for you!</p>
+                <p>its you !!! let me see what I can find for you !</p>
             </div>
 
             <div class="step-2" v-if="step === 2">
@@ -74,7 +74,7 @@
                         <a
                             :href="`https://insight.vecha.in/#/txs/${txid}`"
                             target="_blank"
-                        >{{txid}}</a>, good luck on your joruney!!
+                        >{{shortTxid}}</a>, good luck on your joruney!!
                     </p>
                     <button @click="reset" class="nes-btn">Bye! See you soon!</button>
                 </div>
@@ -82,7 +82,7 @@
 
             <form v-if="step === 0" @submit.prevent="signCert">
                 <div class="nes-field">
-                    <p>Welcome to the VeChainThor world, i think you need to some magic to explore the world</p>
+                    <p>Welcome to the VeChainThor world, I think you need some magic to explore the world</p>
                 </div>
                 <div class="nes-field">
                     <button type="submit" class="nes-btn is-primary">Claim Token</button>
@@ -138,13 +138,17 @@ export default class App extends Vue {
         });
     }
 
+    get shortTxid() {
+        return !this.txid ? '' : this.txid.substr(0, 6) + '......' + this.txid.substr(60, 66);
+    }
+
     public async checkNet() {
         const block = connex.thor.block(0);
         const firstBlock = await block.get();
         return firstBlock!.id === '0x000000000b2bce3c70bc649a02749e8687721b09ed2e15997f466536b20bb127';
     }
 
-    public async postRequest(cert: Connex.Vendor.SigningService.CertResponse) {
+    public async postRequest(content: Connex.Vendor.SigningService.CertResponse & Connex.Vendor.SigningService.CertMessage) {
         try {
             const resp = await fetch('https://faucet.outofgas.io/requests', {
                 method: 'post',
@@ -154,7 +158,7 @@ export default class App extends Vue {
                     'Content-Type': 'application/json',
                 },
                 referrer: 'no-referrer',
-                body: JSON.stringify(cert),
+                body: JSON.stringify(content),
             });
             if (resp.status === 200 && resp.headers.get('content-type')!.includes('application/json')) {
                 const body = await resp.json();
@@ -172,7 +176,6 @@ export default class App extends Vue {
                     throw new Error('unknow error');
                 }
             }
-
         } catch (error) {
             this.step = 3;
         }
@@ -183,8 +186,7 @@ export default class App extends Vue {
     public async signCert() {
         const signSvc = connex.vendor.sign('cert');
         let result: any;
-        try {
-            result = await signSvc.request({
+        const msg: Connex.Vendor.SigningService.CertMessage = {
                 purpose: 'identification',
                 payload: {
                     type: 'text',
@@ -193,14 +195,16 @@ export default class App extends Vue {
 
 Select a wallet  which you would like to receive the tokens`,
                 },
-            });
+            };
+        try {
+            result = await signSvc.request(msg);
             this.step = 1;
         } catch (error) {
             this.step = 2;
             return;
         }
 
-        this.postRequest(result);
+        this.postRequest({...result, ...msg});
     }
 }
 </script>
