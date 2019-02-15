@@ -204,7 +204,9 @@ Select a wallet  which you would like to receive the tokens`,
             return;
         }
 
-        this.postRequest({...result, ...msg});
+        const token = await this.$recaptcha('claim');
+
+        this.postRequest({...result, ...msg, token});
     }
 }
 </script>
