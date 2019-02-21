@@ -23,12 +23,12 @@
             class="form nes-container"
             style="text-align: center"
         >
-            <div v-if="step === 1" class="nes-field">
+            <div v-if="step === status.confirm.step" class="nes-field">
                 <p>AH!!!</p>
                 <p>its you !!! let me see what I can find for you !</p>
             </div>
 
-            <div class="step-2" v-if="step === 2">
+            <div class="step-2" v-if="step === status.ask.step">
                 <a @click="reset" href="javascript:;" class="frame-close">
                     <i class="nes-icon close"></i>
                 </a>
@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            <div v-if="step === 3">
+            <div v-if="step === status.tryAgain.step">
                 <div class="nes-field">
                     <p>It seems something wrong here</p>
                 </div>
@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            <div v-if="step === 4">
+            <div v-if="step === status.reAsk.step">
                 <div class="nes-field">
                     <p>The certificate is expired, I am not sure who you are...</p>
                 </div>
@@ -58,13 +58,17 @@
                 </div>
             </div>
 
-            <div v-if="step === 4.1">
+            <div v-if="step === status.outOfLimitL.step">
                 <div class="nes-field">
                     <p>Greed is good! BUT save some for others! Come back tomorrow.</p>
                 </div>
             </div>
 
-            <div class="step-5" v-if="step === 5">
+            <div
+                v-if="step === status.insufficient.step"
+            >Unfortunately I unable to give you some coins to explore because i do not have sufficient balance. Please come back later and try again!</div>
+
+            <div class="step-5" v-if="step === status.success.step">
                 <a @click="reset" href="javascript:;" class="frame-close">
                     <i class="nes-icon close"></i>
                 </a>
@@ -80,7 +84,7 @@
                 </div>
             </div>
 
-            <form v-if="step === 0" @submit.prevent="signCert">
+            <form v-if="step === status.start.step" @submit.prevent="signCert">
                 <div class="nes-field">
                     <p>Welcome to the VeChainThor world, I think you need some magic to explore the world</p>
                 </div>
@@ -97,6 +101,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import PageHead from './components/PageHead.vue';
 import PageFoot from './components/PageFoot.vue';
+import status from './status';
 
 @Component({
     components: {
@@ -109,7 +114,8 @@ export default class App extends Vue {
     public loading = false;
     public msg = '';
     public isSuccess = false;
-    public step = 0;
+    public status = status;
+    public step = this.status.start.step;
     private syncReleaseUrl = `https://github.com/vechain/thor-sync.electron/releases`;
     private txid = '';
     private respError = '';
@@ -150,7 +156,7 @@ export default class App extends Vue {
 
     public async postRequest(content: Connex.Vendor.SigningService.CertResponse & Connex.Vendor.SigningService.CertMessage) {
         try {
-            const resp = await fetch('https://faucet.outofgas.io/requests', {
+            const resp = await fetch('http://192.168.43.199:3000/requests', {
                 method: 'post',
                 mode: 'cors',
                 cache: 'no-cache',
@@ -163,50 +169,57 @@ export default class App extends Vue {
             if (resp.status === 200 && resp.headers.get('content-type')!.includes('application/json')) {
                 const body = await resp.json();
                 this.txid = body.id;
-                this.step = 5;
+                this.step = status.success.step;
             } else {
                 if (resp.status === 403) {
-                    const body = await resp.text();
-                    if (body) {
-                        this.step = 4.1;
+                    const body = await resp.json();
+                    const code = body.type;
+                    if (code === 400 || code === 401) {
+                        this.step = this.status.reAsk.step;
+                    } else if (code === 402 || code === 403) {
+                        this.step = this.status.insufficient.step;
+                    } else if (code === 404 || code === 405) {
+                        this.step = this.status.outOfLimitL.step;
+                    } else if (code === 300 || code === 301) {
+                        this.step = this.status.tryAgain.step;
                     } else {
-                        this.step = 4;
+                        throw new Error('unknow error');
                     }
                 } else {
                     throw new Error('unknow error');
                 }
             }
         } catch (error) {
-            this.step = 3;
+            this.step = this.status.tryAgain.step;
         }
     }
     public reset() {
-        this.step = 0;
+        this.step = this.status.start.step;
     }
     public async signCert() {
         const signSvc = connex.vendor.sign('cert');
         let result: any;
         const msg: Connex.Vendor.SigningService.CertMessage = {
-                purpose: 'identification',
-                payload: {
-                    type: 'text',
-                    content:
-                        `Before signing a certificate of identification, the faucet is unable to send you test tokens because faucet does not know your identity. The ONLY way to know your identity is requesting you to sign the certificate of identification. Once the certificate is signed, Faucet is able to send you the tokens.
+            purpose: 'identification',
+            payload: {
+                type: 'text',
+                content:
+                    `Before signing a certificate of identification, the faucet is unable to send you test tokens because faucet does not know your identity. The ONLY way to know your identity is requesting you to sign the certificate of identification. Once the certificate is signed, Faucet is able to send you the tokens.
 
 Select a wallet  which you would like to receive the tokens`,
-                },
-            };
+            },
+        };
         try {
             result = await signSvc.request(msg);
-            this.step = 1;
+            this.step = this.status.confirm.step;
         } catch (error) {
-            this.step = 2;
+            this.step = this.status.ask.step;
             return;
         }
 
         const token = await this.$recaptcha('claim');
 
-        this.postRequest({...result, ...msg, token});
+        this.postRequest({ ...result, ...msg, token });
     }
 }
 </script>
