@@ -124,6 +124,7 @@ export default class App extends Vue {
     private isTestNet = true;
 
     public async created() {
+        this.$ga.page('/faucet')
         if (this.hasConnex) {
             this.isTestNet = await this.checkNet();
         }

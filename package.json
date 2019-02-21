@@ -12,6 +12,7 @@
     "custom-protocol-detection": "1.0.1",
     "nes.css": "1.0.0",
     "vue": "^2.5.21",
+    "vue-analytics": "5.16.2",
     "vue-class-component": "^6.0.0",
     "vue-property-decorator": "^7.0.0",
     "vue-recaptcha-v3": "1.2.1"
