@@ -157,7 +157,7 @@ export default class App extends Vue {
 
     public async postRequest(content: Connex.Vendor.SigningService.CertResponse & Connex.Vendor.SigningService.CertMessage) {
         try {
-            const resp = await fetch('https://faucet.outofgas.io/requests', {
+            const resp = await fetch('https://faucet-new.outofgas.io/requests', {
                 method: 'post',
                 mode: 'cors',
                 cache: 'no-cache',
