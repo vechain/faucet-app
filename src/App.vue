@@ -1,28 +1,11 @@
 <template>
     <div id="app">
-        <PageHead v-if="hasConnex && isTestNet"/>
-        <section v-if="!hasConnex" class="nes-container with-title">
-            <h2 class="title">Connex not detected</h2>
-            <p>
-                It's recommended to open in
-                <span
-                    style="color: rgb(42, 64, 163); font-size: 24px"
-                >VeChain Sync</span>.
-            </p>
-            <div>
-                <a @click="openSync" href="javascript:;" class="sync-link">Open</a> or
-                <a :href="syncReleaseUrl" class="sync-link">Download</a> VeChain Sync.
-            </div>
-        </section>
+        <PageHead v-if="isTestNet"/>
         <section
-            v-if="hasConnex && !isTestNet"
+            v-if="!isTestNet"
             class="nes-container with-title"
         >Faucet is only available in testnet.</section>
-        <section
-            v-if="hasConnex && isTestNet"
-            class="form nes-container"
-            style="text-align: center"
-        >
+        <section v-if="isTestNet" class="form nes-container" style="text-align: center">
             <div v-if="step === status.confirm.step" class="nes-field">
                 <p>AH!!!</p>
                 <p>its you !!! let me see what I can find for you !</p>
@@ -120,14 +103,11 @@ export default class App extends Vue {
     private txid = '';
     private respError = '';
 
-    private hasConnex = window.connex && window.connex.vendor;
     private isTestNet = true;
 
     public async created() {
-        this.$ga.page('/faucet')
-        if (this.hasConnex) {
-            this.isTestNet = await this.checkNet();
-        }
+        this.$ga.page('/faucet');
+        this.isTestNet = await this.checkNet();
     }
 
     public openSync() {
