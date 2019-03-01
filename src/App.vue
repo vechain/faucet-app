@@ -49,7 +49,7 @@
 
             <div
                 v-if="step === status.insufficient.step"
-            >Unfortunately I unable to give you some coins to explore because i do not have sufficient balance. Please come back later and try again!</div>
+            >Unfortunately I unable to give you some coins to explore because I do not have sufficient balance. Please come back later and try again!</div>
 
             <div class="step-5" v-if="step === status.success.step">
                 <a @click="reset" href="javascript:;" class="frame-close">
@@ -63,16 +63,16 @@
                             target="_blank"
                         >{{shortTxid}}</a>, good luck on your joruney!!
                     </p>
-                    <button @click="reset" class="nes-btn">Bye! See you soon!</button>
+                    <button @click="reset" class="nes-btn">See you soon!</button>
                 </div>
             </div>
 
             <form v-if="step === status.start.step" @submit.prevent="signCert">
                 <div class="nes-field">
-                    <p>Welcome to the VeChainThor world, I think you need some magic to explore the world</p>
+                    <p>Welcome to the VeChain world, I think you need some tokens to explore the world</p>
                 </div>
                 <div class="nes-field">
-                    <button type="submit" class="nes-btn is-primary">Claim Token</button>
+                    <button type="submit" class="nes-btn is-primary">Claim Tokens</button>
                 </div>
             </form>
         </section>
@@ -185,7 +185,7 @@ export default class App extends Vue {
             payload: {
                 type: 'text',
                 content:
-                    `Before signing a certificate of identification, the faucet is unable to send you test tokens because faucet does not know your identity. The ONLY way to know your identity is requesting you to sign the certificate of identification. Once the certificate is signed, Faucet is able to send you the tokens.
+                    `Before signing a certificate of identification, the faucet is unable to send you test tokens because faucet does not know your identity. The ONLY way to know your identity is requesting you to sign the certificate of identification. Once the certificate is signed, Faucet is able to send you tokens.
 
 Select a wallet  which you would like to receive the tokens`,
             },
