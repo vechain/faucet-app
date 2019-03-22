@@ -13,9 +13,7 @@ Vue.use(VueReCaptcha, {
 });
 Vue.use(VueAnalytics, {
   id: 'UA-132391998-2',
-  debug: {
-    sendHitTask: process.env.NODE_ENV === 'production',
-  },
+  disabled: process.env.NODE_ENV !== 'production'
 });
 Vue.config.productionTip = false;
 
