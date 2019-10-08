@@ -61,7 +61,7 @@
                         <a
                             :href="`https://insight.vecha.in/#/txs/${txid}`"
                             target="_blank"
-                        >{{shortTxid}}</a>, good luck on your joruney!!
+                        >{{shortTxid}}</a>, good luck on your journey!!
                     </p>
                     <button @click="reset" class="nes-btn">See you soon!</button>
                 </div>
