@@ -6,14 +6,14 @@ import { VueReCaptcha } from 'vue-recaptcha-v3';
 import VueAnalytics from 'vue-analytics';
 
 Vue.use(VueReCaptcha, {
-  siteKey: '6LfLo5EUAAAAACZJiD1pMTt0nf2XvFOXK3jTdEhx',
+  siteKey: '6Ld6GK4ZAAAAAH0a6en6f9lB7vkA5r0NJTYRr1Lc',
   loaderOptions: {
     useRecaptchaNet: true,
   },
 });
 Vue.use(VueAnalytics, {
   id: 'UA-132391998-2',
-  disabled: process.env.NODE_ENV !== 'production'
+  disabled: process.env.NODE_ENV !== 'production',
 });
 Vue.config.productionTip = false;
 
