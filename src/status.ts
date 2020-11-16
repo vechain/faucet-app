@@ -23,4 +23,4 @@ export default {
   insufficient: {
     step: 6,
   },
-};
+}

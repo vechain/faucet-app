@@ -1,3 +1,4 @@
+import { Connex } from '@vechain/connex'
 import Vue, { VNode } from 'vue';
 
 declare global {

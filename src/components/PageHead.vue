@@ -11,36 +11,38 @@
     </header>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator'
 
 @Component
 export default class PageHeader extends Vue {
-    public balance = '0x0';
-    public energy = '0x0';
-    private account = connex.thor.account('0x4f6FC409e152D33843Cf4982d414C1Dd0879277e');
+    public balance = '0x0'
+    public energy = '0x0'
+    private account = this.$connex.thor.account(
+        '0x4f6FC409e152D33843Cf4982d414C1Dd0879277e'
+    )
 
     get vet() {
-        const result = parseInt(this.balance, 16) / 1e18;
+        const result = parseInt(this.balance, 16) / 1e18
 
-        return Math.round(result).toLocaleString();
+        return Math.round(result).toLocaleString()
     }
 
     get vtho() {
-        const result = parseInt(this.energy, 16) / 1e18;
+        const result = parseInt(this.energy, 16) / 1e18
 
-        return Math.round(result).toLocaleString();
+        return Math.round(result).toLocaleString()
     }
     public async setBalance() {
-        const theAccount = await this.account.get();
-        this.balance = theAccount.balance;
-        this.energy = theAccount.energy;
+        const theAccount = await this.account.get()
+        this.balance = theAccount.balance
+        this.energy = theAccount.energy
     }
     public async created() {
-        this.setBalance();
-        const ticker = connex.thor.ticker();
-        for (; ;) {
-            await ticker.next();
-            await this.setBalance();
+        this.setBalance()
+        const ticker = this.$connex.thor.ticker()
+        for (;;) {
+            await ticker.next()
+            await this.setBalance()
         }
     }
 }

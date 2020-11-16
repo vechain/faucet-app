@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <PageHead v-if="isTestNet"/>
+        <PageHead v-if="isTestNet" />
         <section
             v-if="!isTestNet"
             class="nes-container with-title"
@@ -76,15 +76,15 @@
                 </div>
             </form>
         </section>
-        <PageFoot/>
+        <PageFoot />
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import PageHead from './components/PageHead.vue';
-import PageFoot from './components/PageFoot.vue';
-import status from './status';
+import { Component, Vue } from 'vue-property-decorator'
+import PageHead from './components/PageHead.vue'
+import PageFoot from './components/PageFoot.vue'
+import status from './status'
 
 @Component({
     components: {
@@ -93,114 +93,110 @@ import status from './status';
     },
 })
 export default class App extends Vue {
-    public address = '';
-    public loading = false;
-    public msg = '';
-    public isSuccess = false;
-    public status = status;
-    public step = this.status.start.step;
-    private syncReleaseUrl = `https://github.com/vechain/thor-sync.electron/releases`;
-    private txid = '';
-    private respError = '';
+    public address = ''
+    public loading = false
+    public msg = ''
+    public isSuccess = false
+    public status = status
+    public step = this.status.start.step
+    private txid = ''
+    private respError = ''
 
-    private isTestNet = true;
+    private isTestNet = true
 
     public async created() {
-        this.$ga.page('/faucet');
-        this.isTestNet = await this.checkNet();
-    }
-
-    public openSync() {
-        const customProtocolDetection = require('custom-protocol-detection');
-        const vechainAppUrl = 'vechain-app:///' + encodeURIComponent(window.location.href);
-        const gotoDownload = () => {
-            window.location.href = this.syncReleaseUrl;
-        };
-        customProtocolDetection(vechainAppUrl, () => {
-            gotoDownload();
-        }, () => {
-            // TODO Open with sync
-        }, () => {
-            gotoDownload();
-        });
+        this.$ga.page('/faucet')
+        this.isTestNet = await this.checkNet()
     }
 
     get shortTxid() {
-        return !this.txid ? '' : this.txid.substr(0, 6) + '......' + this.txid.substr(60, 66);
+        return !this.txid
+            ? ''
+            : this.txid.substr(0, 6) + '......' + this.txid.substr(60, 66)
     }
 
     public async checkNet() {
-        const block = connex.thor.block(0);
-        const firstBlock = await block.get();
-        return firstBlock!.id === '0x000000000b2bce3c70bc649a02749e8687721b09ed2e15997f466536b20bb127';
+        const block = this.$connex.thor.block(0)
+        const firstBlock = await block.get()
+        return (
+            firstBlock!.id ===
+            '0x000000000b2bce3c70bc649a02749e8687721b09ed2e15997f466536b20bb127'
+        )
     }
 
-    public async postRequest(content: Connex.Vendor.SigningService.CertResponse & Connex.Vendor.SigningService.CertMessage) {
+    public async postRequest(
+        content: Connex.Vendor.CertMessage & Connex.Vendor.TxResponse
+    ) {
         try {
-            const resp = await fetch('https://faucet-new.outofgas.io/requests', {
-                method: 'post',
-                mode: 'cors',
-                cache: 'no-cache',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                referrer: 'no-referrer',
-                body: JSON.stringify(content),
-            });
-            if (resp.status === 200 && resp.headers.get('content-type')!.includes('application/json')) {
-                const body = await resp.json();
-                this.txid = body.id;
-                this.step = status.success.step;
+            const resp = await fetch(
+                'https://faucet-new.outofgas.io/requests',
+                {
+                    method: 'post',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    referrer: 'no-referrer',
+                    body: JSON.stringify(content),
+                }
+            )
+            if (
+                resp.status === 200 &&
+                resp.headers.get('content-type')!.includes('application/json')
+            ) {
+                const body = await resp.json()
+                this.txid = body.id
+                this.step = status.success.step
             } else {
                 if (resp.status === 403) {
-                    const body = await resp.json();
-                    const code = body.type;
+                    const body = await resp.json()
+                    const code = body.type
                     if (code === 400 || code === 401) {
-                        this.step = this.status.reAsk.step;
+                        this.step = this.status.reAsk.step
                     } else if (code === 402 || code === 403) {
-                        this.step = this.status.insufficient.step;
+                        this.step = this.status.insufficient.step
                     } else if (code === 404 || code === 405) {
-                        this.step = this.status.outOfLimitL.step;
+                        this.step = this.status.outOfLimitL.step
                     } else if (code === 300 || code === 301) {
-                        this.step = this.status.tryAgain.step;
+                        this.step = this.status.tryAgain.step
                     } else {
-                        throw new Error('unknow error');
+                        throw new Error('unknow error')
                     }
                 } else {
-                    throw new Error('unknow error');
+                    throw new Error('unknow error')
                 }
             }
         } catch (error) {
-            this.step = this.status.tryAgain.step;
+            this.step = this.status.tryAgain.step
         }
     }
     public reset() {
-        this.step = this.status.start.step;
+        this.step = this.status.start.step
     }
     public async signCert() {
-        const signSvc = connex.vendor.sign('cert');
-        let result: any;
-        const msg: Connex.Vendor.SigningService.CertMessage = {
+        let result: any
+        const msg: Connex.Vendor.CertMessage = {
             purpose: 'identification',
             payload: {
                 type: 'text',
-                content:
-                    `Before signing a certificate of identification, the faucet is unable to send you test tokens because faucet does not know your identity. The ONLY way to know your identity is requesting you to sign the certificate of identification. Once the certificate is signed, Faucet is able to send you tokens.
+                content: `Before signing a certificate of identification, the faucet is unable to send you test tokens because faucet does not know your identity. The ONLY way to know your identity is requesting you to sign the certificate of identification. Once the certificate is signed, Faucet is able to send you tokens.
 
 Select a wallet  which you would like to receive the tokens`,
             },
-        };
+        }
+        const signSvc = this.$connex.vendor.sign('cert', msg)
         try {
-            result = await signSvc.request(msg);
-            this.step = this.status.confirm.step;
+            result = await signSvc.request()
+            this.step = this.status.confirm.step
         } catch (error) {
-            this.step = this.status.ask.step;
-            return;
+            this.step = this.status.ask.step
+            return
         }
 
-        const token = await this.$recaptcha('claim');
+        const token = await this.$recaptcha('claim')
 
-        this.postRequest({ ...result, ...msg, token });
+        this.postRequest({ ...result, ...msg, token })
     }
 }
 </script>
