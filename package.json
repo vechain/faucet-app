@@ -8,7 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@vechain/connex": "1.0.0",
+    "@vechain/connex": "^2.0.0-beta.24",
     "custom-protocol-detection": "1.0.1",
     "nes.css": "1.0.0",
     "vue": "^2.5.21",
@@ -21,7 +21,7 @@
     "@vue/cli-plugin-typescript": "^3.1.0",
     "@vue/cli-service": "^3.1.0",
     "lint-staged": "^8.1.0",
-    "typescript": "^3.0.0",
+    "typescript": "^3.9.7",
     "vue-template-compiler": "^2.5.21"
   },
   "postcss": {
