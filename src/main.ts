@@ -4,7 +4,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import { VueReCaptcha } from 'vue-recaptcha-v3'
 import VueAnalytics from 'vue-analytics'
-import { Connex } from '@vechain/connex'
+import Connex from '@vechain/connex'
 
 Vue.use(VueReCaptcha, {
   siteKey: '6Ld6GK4ZAAAAAH0a6en6f9lB7vkA5r0NJTYRr1Lc',
