@@ -13,7 +13,7 @@ Vue.use(VueReCaptcha, {
   },
 })
 
-const connex = new Connex('https://testnet.veblocks.net', { network: 'test' })
+const connex = new Connex({ node: 'https://testnet.veblocks.net', network: 'test' })
 
 declare module 'vue/types/vue' {
   interface Vue {
