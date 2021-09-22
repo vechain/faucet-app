@@ -15,22 +15,24 @@ import { Component, Vue } from 'vue-property-decorator'
 
 @Component
 export default class PageHeader extends Vue {
-    public balance = '0x0'
-    public energy = '0x0'
+    public balance: null|string = null
+    public energy: null|string = null
     private account = this.$connex.thor.account(
         '0x4f6FC409e152D33843Cf4982d414C1Dd0879277e'
     )
 
     get vet() {
-        const result = parseInt(this.balance, 16) / 1e18
-
-        return Math.round(result).toLocaleString()
+        if (this.balance == null) {
+            return '--'
+        }
+        return Math.round(parseInt(this.balance, 16) / 1e18).toLocaleString()
     }
 
     get vtho() {
-        const result = parseInt(this.energy, 16) / 1e18
-
-        return Math.round(result).toLocaleString()
+        if (this.energy == null) {
+            return '--'
+        }
+        return Math.round(parseInt(this.energy, 16) / 1e18).toLocaleString()
     }
     public async setBalance() {
         const theAccount = await this.account.get()
@@ -39,6 +41,7 @@ export default class PageHeader extends Vue {
     }
     public async created() {
         this.setBalance()
+
         const ticker = this.$connex.thor.ticker()
         for (;;) {
             await ticker.next()

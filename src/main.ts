@@ -13,7 +13,7 @@ Vue.use(VueReCaptcha, {
   },
 })
 
-const connex = new Connex({ node: 'https://testnet.veblocks.net', network: 'test' })
+const connex = new Connex({ node: 'https://testnet.veblocks.net', network: 'test', noV1Compat: true })
 
 declare module 'vue/types/vue' {
   interface Vue {
@@ -22,7 +22,6 @@ declare module 'vue/types/vue' {
 }
 
 Vue.prototype.$connex = connex
-
 Vue.use(VueAnalytics, {
   id: 'UA-132391998-2',
   disabled: process.env.NODE_ENV !== 'production',
