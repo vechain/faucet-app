@@ -1,11 +1,7 @@
 <template>
     <div id="app">
-        <PageHead v-if="isTestNet" />
-        <section
-            v-if="!isTestNet"
-            class="nes-container with-title"
-        >Faucet is only available in testnet.</section>
-        <section v-if="isTestNet" class="form nes-container" style="text-align: center">
+        <PageHead/>
+        <section class="form nes-container" style="text-align: center">
             <div v-if="step === status.confirm.step" class="nes-field">
                 <p>AH!!!</p>
                 <p>its you !!! let me see what I can find for you !</p>
@@ -102,26 +98,10 @@ export default class App extends Vue {
     private txid = ''
     private respError = ''
 
-    private isTestNet = true
-
-    public async created() {
-        this.$ga.page('/faucet')
-        this.isTestNet = await this.checkNet()
-    }
-
     get shortTxid() {
         return !this.txid
             ? ''
             : this.txid.substr(0, 6) + '......' + this.txid.substr(60, 66)
-    }
-
-    public async checkNet() {
-        const block = this.$connex.thor.block(0)
-        const firstBlock = await block.get()
-        return (
-            firstBlock!.id ===
-            '0x000000000b2bce3c70bc649a02749e8687721b09ed2e15997f466536b20bb127'
-        )
     }
 
     public async postRequest(
