@@ -109,7 +109,7 @@ export default class App extends Vue {
     ) {
         try {
             const resp = await fetch(
-                'https://faucet-new.outofgas.io/requests',
+                'https://valve.outofgas.io/requests',
                 {
                     method: 'post',
                     mode: 'cors',
