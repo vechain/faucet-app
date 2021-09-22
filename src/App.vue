@@ -55,7 +55,7 @@
                     <p>
                         I found this!!! TXID:
                         <a
-                            :href="`https://insight.vecha.in/#/txs/${txid}`"
+                            :href="`https://insight.vecha.in/#/test/txs/${txid}`"
                             target="_blank"
                         >{{shortTxid}}</a>, good luck on your journey!!
                     </p>
