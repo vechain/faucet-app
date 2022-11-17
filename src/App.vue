@@ -165,7 +165,10 @@ export default class App extends Vue {
 Select a wallet  which you would like to receive the tokens`,
             },
         }
-        const signSvc = this.$connex.vendor.sign('cert', msg)
+
+        const connexVendor = await this.$getConnexVendor()
+        const signSvc = connexVendor.sign('cert', msg)
+
         try {
             result = await signSvc.request()
             this.step = this.status.confirm.step

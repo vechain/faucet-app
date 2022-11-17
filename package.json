@@ -19,6 +19,7 @@
     "vue-recaptcha-v3": "1.2.1"
   },
   "devDependencies": {
+    "@vechainfoundation/veworld-types": "^0.0.8-beta",
     "@vue/cli-plugin-typescript": "^3.1.0",
     "@vue/cli-service": "^3.1.0",
     "lint-staged": "^8.1.0",
