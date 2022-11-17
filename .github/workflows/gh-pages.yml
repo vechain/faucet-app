@@ -14,6 +14,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  packages: read
 
 # Allow one concurrent deployment
 concurrency:
@@ -33,9 +34,15 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v2
         
-      - uses: actions/setup-node@v2
+      - name: Use Node v12
+        uses: actions/setup-node@v3
         with:
-          node-version: '12'
+          node-version: 12
+          registry-url: 'https://npm.pkg.github.com'
+          always-auth: true
+          scope: '@vechainfoundation'
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Cache Node.js modules
         uses: actions/cache@v2
