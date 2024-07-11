@@ -9,6 +9,10 @@ module "faucet-app-domains" {
   project                 = local.env.project
   env                     = local.env.environment
   public_zone_record_name = "${local.env.environment}.${local.env.project}"
+  records                 = [
+    "${local.env.environment}.${local.env.project}.vechain.org"
+  ]
+  subdomain_type          = "CNAME"
   create_cert             = true
 }
 
