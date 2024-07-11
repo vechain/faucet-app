@@ -3,7 +3,7 @@ variable "project" {
 }
 
 module "faucet-app-domains" {
-  source                  = "git@github.com:vechain/terraform_infrastructure_modules.git//route53?ref=dont-require-vpc_id"
+  source                  = "git@github.com:vechain/terraform_infrastructure_modules.git//route53?ref=v.1.0.44"
   public_zone_name        = "${local.env.environment}.${local.env.project}.vechain.org"
   domain_name             = "${local.env.project}.vechain.org"
   project                 = local.env.project
